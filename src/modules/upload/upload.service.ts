@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import * as crypto from 'crypto';
 import { fileTypeFromBuffer } from 'file-type';
 import * as fs from 'fs';
-import { currentDirPath, makeSureDirExists } from 'src/utils/fs';
+import { nanoid } from 'nanoid';
+import { Path } from 'src/utils/fs';
 import { Transform } from 'stream';
 
 @Injectable()
@@ -18,12 +18,7 @@ export class UploadService {
     });
 
     const staticFile = {} as StaticFile;
-
-    const hash = crypto.createHash('md5').update(url).digest('hex');
-    const filePath = currentDirPath(`uploads/${hash}.tmp`);
-
-    makeSureDirExists(currentDirPath('uploads'));
-
+    const filePath = Path(`temp/${nanoid(16)}.tmp`);
     const writer = fs.createWriteStream(filePath);
 
     const bufferList: Buffer[] = [];
@@ -35,7 +30,7 @@ export class UploadService {
           const fileTypeResult = await fileTypeFromBuffer(buffer);
           staticFile.ext = fileTypeResult?.ext || '';
           staticFile.mineType = fileTypeResult?.mime || '';
-          fs.unlink(filePath, () => {});
+          //  fs.unlink(filePath, () => {});
         }
         fileTypeStream.push(chunk);
         callback();

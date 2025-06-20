@@ -6,12 +6,19 @@ export function currentDirPath(filePath: string) {
   return path.join(process.cwd(), ...pathArr);
 }
 
-export function makeSureDirExists(dirPath: string, createWhenNotExists = true) {
+export function relativeSrcPath(filePath: string) {
+  return path.join(process.cwd(), filePath);
+}
+
+export function makeSureDirExists(dirPath: string) {
   if (!fs.existsSync(dirPath)) {
-    if (createWhenNotExists) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    } else {
-      throw new Error(`Directory ${dirPath} does not exist`);
-    }
+    fs.mkdirSync(dirPath, { recursive: true });
   }
+}
+
+export function Path(relativePath: string) {
+  const pathList = relativePath.split('/').filter(Boolean);
+  const filePath = path.join(process.cwd(), ...pathList);
+  makeSureDirExists(path.dirname(filePath));
+  return filePath;
 }

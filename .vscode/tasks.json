@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Generate Nest Module (Ask path)",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/gen-module.js", "${input:modulePath}"],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "modulePath",
+      "type": "promptString",
+      "description": "请输入模块路径（如 modules/test）",
+      "default": "modules/"
+    }
+  ]
+}
