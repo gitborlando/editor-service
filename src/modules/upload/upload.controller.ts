@@ -5,7 +5,7 @@ import { UploadService } from './upload.service';
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post()
+  @Post('url')
   async downloadFile(@Body() body: { url: string }) {
     return this.uploadService.downloadFile(body.url);
   }

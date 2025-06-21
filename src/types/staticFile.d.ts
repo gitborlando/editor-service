@@ -61,12 +61,11 @@ type MineTypeMap = {
 };
 
 type StaticFile = {
-  id: string;
   name: string;
   ext: string;
   mineType: MineTypeMap[keyof MineTypeMap];
   size: number;
   url: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };

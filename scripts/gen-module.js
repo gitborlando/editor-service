@@ -1,4 +1,4 @@
-const { execSync } = require('child_process');
+import { execSync } from 'child_process';
 
 // 获取命令行参数，默认路径是 modules/resource
 const targetPath = process.argv[2] || 'modules/resource';
