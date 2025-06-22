@@ -1,12 +1,17 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { UploadService } from './upload.service';
 
-@Controller('upload')
+@Controller('upload/static')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post('url')
-  async downloadFile(@Body() body: { url: string }) {
-    return this.uploadService.downloadFile(body.url);
+  @Get('remote-url')
+  async uploadByUrl(@Query('url') url: string) {
+    return this.uploadService.uploadByUrl(url);
+  }
+
+  @Get('get-signed-url')
+  async getSignedUrl(@Query('ext') ext: string) {
+    return this.uploadService.getSignedUrl(ext);
   }
 }

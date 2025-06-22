@@ -1,5 +1,6 @@
-import { S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { fileTypeFromBuffer } from 'file-type';
@@ -44,7 +45,32 @@ export class UploadService {
     return `${year}/${month}/${day}/${nanoid(16)}.${ext}`;
   }
 
-  async downloadFile(url: string): Promise<StaticFile> {
+  private genOSSUrl(key: string) {
+    return `https://s-gz-13280-static.oss.dogecdn.com/${key}`;
+  }
+
+  async getSignedUrl(ext: string) {
+    const ossAuth = await this.authService.getOSSAuth();
+    const s3 = new S3Client({
+      region: 'automatic',
+      endpoint: ossAuth.Buckets[0].s3Endpoint,
+      credentials: ossAuth.Credentials,
+    });
+    const key = this.genOSSKey(ext);
+    const command = new PutObjectCommand({
+      Bucket: ossAuth.Buckets[0].s3Bucket,
+      Key: key,
+    });
+    const signedUploadUrl = await getSignedUrl(s3, command, {
+      expiresIn: 60 * 2,
+    });
+    return {
+      signedUploadUrl,
+      url: this.genOSSUrl(key),
+    };
+  }
+
+  async uploadByUrl(url: string): Promise<StaticFile> {
     const downloadRes = (await axios({
       url,
       method: 'GET',
@@ -61,7 +87,6 @@ export class UploadService {
       const buffer = Buffer.concat(bufferList);
       if (!staticFile.ext && buffer.length > this.BUFFER_THRESHOLD) {
         const fileTypeResult = await fileTypeFromBuffer(buffer);
-        console.log('fileTypeResult: ', fileTypeResult);
         staticFile.ext = fileTypeResult?.ext || '';
         staticFile.mineType = fileTypeResult?.mime || '';
         suspendFileTypeDetected.endSuspend();
