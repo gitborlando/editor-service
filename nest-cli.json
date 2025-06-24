@@ -11,5 +11,6 @@
     },
     "deleteOutDir": true,
     "typeCheck": true
-  }
+  },
+  "plugins": ["@nestjs/swagger/plugin"]
 }
